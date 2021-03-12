@@ -9,20 +9,18 @@ const {dbConnection} = require ('./database/config')
 //Crear server express
 const app = express();
 
+app.listen(process.env.PORT, ()=>{
+    console.log('Server run on port '+process.env.PORT);
+});
 //base de datos
 dbConnection();
 
 //config CORS
 app.use(cors())
 
-//Rutas
-app.get( '/', (req,res)=>{
-    res.json({
-        ok:true,
-        msg: "Hola mundo"
-    })
-} )
+//lectura y parseo del body
+app.use(express.json());
 
-app.listen(process.env.PORT, ()=>{
-    console.log('Server run on port '+process.env.PORT);
-});
+//Rutas
+app.use('/api/usuarios', require('./routes/usuarios'));
+app.use('/api/login', require('./routes/auth'));
