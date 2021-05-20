@@ -15,6 +15,9 @@ app.listen(process.env.PORT, ()=>{
 //base de datos
 dbConnection();
 
+//directori Public
+app.use(express.static('public'))
+
 //config CORS
 app.use(cors())
 
