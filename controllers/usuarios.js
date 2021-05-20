@@ -50,11 +50,30 @@ const crearUsuario = async (req,res=response)=>{
 
 const getUsuarios = async (req,res=response)=>{
 
-    const usuarios = await Usuario.find({}, 'nombre role id email');
+    const desde = Number(req.query.desde) || 0;
+    
+    // const usuarios = await Usuario.find({}, 'nombre role id email')
+    //                               .skip(desde)
+    //                               .limit(5);
+                            
+    // const total = await Usuario.count();
+    
+    //mismo codigo, pero para ejecutra simultaneamente ambos await
+    const [usuarios, total] = await Promise.all([
+        Usuario
+            .find({}, 'nombre role id img email')
+            .skip(desde)
+            .limit(5),
+        Usuario.countDocuments()
+
+    ]);
+
+    
+    
     res.json({
         ok:true,
         usuarios,
-        id : 'Usuario que genero la consulta: '+req.id
+        total
     })
 }
 
