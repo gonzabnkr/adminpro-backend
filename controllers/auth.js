@@ -1,6 +1,6 @@
 const {response} = require('express');
-const Usuario = require('../models/usuario');
 const bcrypt = require ('bcryptjs');
+const Usuario = require('../models/usuario');
 const { generateJWT } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
 
@@ -67,12 +67,11 @@ const googleSignIn = async (req,res = response)=>{
         
         await usuario.save();
         const token = await generateJWT(usuario.id);
-        console.log('TOKEN: '+token)
+        
         res.json({
             ok: true,
-            msg: 'Google Sign-in',
             token
-        })
+        });
   
         
     } catch (err) {
@@ -85,15 +84,24 @@ const googleSignIn = async (req,res = response)=>{
    
 }
 
-const renewToken = async (req,res = response)=>{
-    const uid = req.uid;
+const renewToken = async(req, res = response) => {
 
-    const token = await generateJWT(uid)
-    
+    const uid = req.uid;
+	
+
+    // Generar el TOKEN - JWT
+    const token = await generateJWT( uid );
+
+    // Obtener el usuario por UID
+	 const usuario = await Usuario.findById( uid );
+
+
     res.json({
         ok: true,
-        token
-    })
+        token,
+        usuario
+    });
+
 }
 
 module.exports={

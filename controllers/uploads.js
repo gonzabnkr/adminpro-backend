@@ -9,7 +9,7 @@ const fs = require('fs')
 const fileUpload = (req,res = response) =>{
 
     const tipo = req.params.tipo
-    const id = req.params.id
+    const uid = req.params.id
     
 
 
@@ -66,7 +66,7 @@ const fileUpload = (req,res = response) =>{
         
         //Actualizar BBDD
 
-        actualizarImagen(tipo, id, nombreArchivo)
+        actualizarImagen(tipo, uid, nombreArchivo)
     
         res.json({
             ok: true,

@@ -6,7 +6,7 @@ const { generateJWT } = require('../helpers/jwt');
 
 
 const crearUsuario = async (req,res=response)=>{
-    const {email,password,nombre} = req.body
+    const {email,password} = req.body
 
     //generate token - JWT
 
@@ -52,6 +52,7 @@ const getUsuarios = async (req,res=response)=>{
 
     const desde = Number(req.query.desde) || 0;
     
+    
     // const usuarios = await Usuario.find({}, 'nombre role id email')
     //                               .skip(desde)
     //                               .limit(5);
@@ -70,8 +71,10 @@ const getUsuarios = async (req,res=response)=>{
 
     
     
+    
     res.json({
         ok:true,
+        uid: req.uid,
         usuarios,
         total
     })
@@ -80,11 +83,11 @@ const getUsuarios = async (req,res=response)=>{
 const actualizarUsuario = async (req,res=response)=>{
     //TODO: Validar token y comprobar si es el usuario correcto
 
-    const id = req.params.id;
+    const uid = req.params.id;
     
     try {
 
-        const usuarioDB = await Usuario.findById(id);
+        const usuarioDB = await Usuario.findById(uid);
 
         if(!usuarioDB){
             return res.status(404).json({
@@ -106,9 +109,16 @@ const actualizarUsuario = async (req,res=response)=>{
                 })
             }
         }
-        campos.email = email;
+        if (!usuarioDB.google){
+            campos.email = email;
+        } else if (usuarioDB.email !== email) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Usuarios de Google no pueden cambiar su correo'
+        })
+        }
 
-        const usuarioActualizado = await Usuario.findByIdAndUpdate( id, campos, {new:true})
+        const usuarioActualizado = await Usuario.findByIdAndUpdate( uid, campos, {new:true})
 
         res.json({
             ok: true,
@@ -125,11 +135,11 @@ const actualizarUsuario = async (req,res=response)=>{
 
 const deleteUsuario = async (req,res=response) =>{
 
-    const id = req.params.id;
+    const uid = req.params.id;
         
     try {
 
-        const usuarioDB = await Usuario.findById(id);
+        const usuarioDB = await Usuario.findById(uid);
 
         if(!usuarioDB){
             return res.status(404).json({
@@ -137,7 +147,7 @@ const deleteUsuario = async (req,res=response) =>{
                 msg: 'No existe el usuario'
             })
         };
-        await Usuario.findByIdAndDelete(id);
+        await Usuario.findByIdAndDelete(uid);
         res.json({
             ok: true,
             msg: 'usuario eleminado'
